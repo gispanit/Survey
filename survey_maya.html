@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סקר שיווק לעסקים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --text: #e8e8f0;
+    --text-muted: #7070a0;
+    --success: #43e97b;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    direction: rtl;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -30%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,101,132,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .header .tag {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .header h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, #e8e8f0 0%, #6c63ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 100px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+  .progress-text {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-weight: 500;
+  }
+
+  .section { display: none; animation: fadeUp 0.5s ease both; }
+  .section.active { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    color: var(--text);
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .q-card:focus-within { border-color: rgba(108,99,255,0.4); }
+  .q-card label.q-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 18px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .q-card .q-hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    margin-top: -10px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .options.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 15px;
+    font-weight: 400;
+    user-select: none;
+  }
+  .opt:hover { border-color: rgba(108,99,255,0.4); background: rgba(108,99,255,0.06); }
+  .opt input { display: none; }
+  .opt .dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .opt.checkbox .dot { border-radius: 6px; }
+  .opt input:checked ~ .dot,
+  .opt.selected .dot { background: var(--accent); border-color: var(--accent); }
+  .opt input:checked ~ .dot::after,
+  .opt.selected .dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    display: block;
+  }
+  .opt.checkbox input:checked ~ .dot::after,
+  .opt.checkbox.selected .dot::after {
+    border-radius: 2px;
+    width: 10px;
+    height: 6px;
+    background: none;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg) translateY(-1px);
+  }
+  .opt.selected { border-color: rgba(108,99,255,0.5); background: rgba(108,99,255,0.1); }
+
+  .q-input, .q-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Heebo', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    direction: rtl;
+  }
+  .q-input:focus, .q-textarea:focus { border-color: rgba(108,99,255,0.5); }
+  .q-textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+
+  .scale-wrap { display: flex; gap: 8px; align-items: center; }
+  .scale-btn {
+    flex: 1;
+    height: 48px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-family: 'Heebo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .scale-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .scale-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .scale-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; gap: 12px; }
+  .btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #8b7cf8);
+    color: white;
+    flex: 1;
+    max-width: 240px;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.3); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); }
+  .btn-secondary:hover { color: var(--text); border-color: var(--text-muted); }
+
+  .error-msg { color: var(--accent2); font-size: 13px; margin-top: 8px; display: none; }
+
+  .thankyou { display: none; text-align: center; padding: 60px 20px; animation: fadeUp 0.6s ease both; }
+  .thankyou.active { display: block; }
+  .thankyou .icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 28px;
+    box-shadow: 0 16px 48px rgba(108,99,255,0.3);
+  }
+  .thankyou h2 { font-size: 32px; font-weight: 900; margin-bottom: 14px; }
+  .thankyou p { color: var(--text-muted); font-size: 16px; line-height: 1.6; }
+
+  .submit-error {
+    background: rgba(255,101,132,0.1);
+    border: 1px solid rgba(255,101,132,0.3);
+    color: var(--accent2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .options.grid-2 { grid-template-columns: 1fr; }
+    .q-card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="tag">מחקר שוק</div>
+    <h1>עזור לנו לבנות את שירות השיווק שתמיד רצית</h1>
+    <p>5 דקות מזמנך יעזרו לנו להבין מה עובד, מה לא, ומה היה חלומך.</p>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">שלב 1 מתוך 5</div>
+
+  <!-- SECTION 0: Business Info -->
+  <div class="section active" id="sec0">
+    <div class="section-label">פרטי עסק</div>
+    <div class="section-title">קודם כל, נכיר את העסק שלך</div>
+
+    <div class="q-card">
+      <label class="q-label">מה שמך?</label>
+      <input type="text" class="q-input" id="name" placeholder="שם מלא">
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">במה עוסק העסק שלך, ומי הלקוח האידיאלי שלך?</label>
+      <textarea class="q-textarea" id="bizDesc" placeholder="לדוגמה: אני מנהל חדר כושר לנשים בגיל 35–55 בתל אביב"></textarea>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">מי מקבל החלטות שיווק בעסק?</label>
+      <div class="options">
+        <label class="opt"><input type="radio" name="decider" value="me"><span class="dot"></span>אני בעצמי</label>
+        <label class="opt"><input type="radio" name="decider" value="employee"><span class="dot"></span>עובד/ת</label>
+        <label class="opt"><input type="radio" name="decider" value="partner"><span class="dot"></span>בן/בת זוג</label>
+        <label class="opt"><input type="radio" name="decider" value="other"><span class="dot"></span>אחר</label>
+      </div>
+    </div>
+
+    <!-- NEW QUESTION 1: Existing content assets -->
+    <div class="q-card">
+      <label class="q-label">האם יש לך תמונות או סרטונים של העסק שלך?</label>
+      <div class="options">
+        <label class="opt"><input type="radio" name="existingAssets" value="good"><span class="dot"></span>כן, יש לי חומר טוב</label>
+        <label class="opt"><input type="radio" name="existingAssets" value="some"><span class="dot"></span>יש לי משהו אבל לא מרוצה מהאיכות</label>
+        <label class="opt"><input type="radio" name="existingAssets" value="little"><span class="dot"></span>כמעט כלום</label>
+        <label class="opt"><input type="radio" name="existingAssets" value="none"><span class="dot"></span>אפס — מתחילים מאפס</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">באילו פלטפורמות חשוב לך להיות נוכח?</label>
+      <p class="q-hint">ניתן לבחור יותר מאחד</p>
+      <div class="options grid-2">
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="instagram"><span class="dot"></span>אינסטגרם</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="facebook"><span class="dot"></span>פייסבוק</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="tiktok"><span class="dot"></span>טיקטוק</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="google"><span class="dot"></span>גוגל</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="linkedin"><span class="dot"></span>לינקדאין</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="whatsapp"><span class="dot"></span>וואטסאפ</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="website"><span class="dot"></span>אתר אינטרנט</label>
+        <label class="opt checkbox"><input type="checkbox" name="platforms" value="notsure"><span class="dot"></span>לא בטוח/ה</label>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div></div>
+      <button class="btn btn-primary" onclick="goTo(1)">הבא ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 1: Marketing Status -->
+  <div class="section" id="sec1">
+    <div class="section-label">מצב נוכחי</div>
+    <div class="section-title">איך נראה השיווק שלך היום?</div>
+
+    <div class="q-card">
+      <label class="q-label">האם אתה עושה שיווק לעסק שלך?</label>
+      <div class="options">
+        <label class="opt"><input type="radio" name="mktStatus" value="active" onchange="handleMktStatus()"><span class="dot"></span>כן, כרגע</label>
+        <label class="opt"><input type="radio" name="mktStatus" value="past" onchange="handleMktStatus()"><span class="dot"></span>כן, בעבר</label>
+        <label class="opt"><input type="radio" name="mktStatus" value="no" onchange="handleMktStatus()"><span class="dot"></span>לא</label>
+      </div>
+    </div>
+
+    <div id="mktYesBlock" style="display:none">
+      <div class="q-card">
+        <label class="q-label">אילו ערוצים השתמשת?</label>
+        <p class="q-hint">ניתן לבחור יותר מאחד</p>
+        <div class="options grid-2">
+          <label class="opt checkbox"><input type="checkbox" name="channels" value="organic"><span class="dot"></span>סושיאל אורגני</label>
+          <label class="opt checkbox"><input type="checkbox" name="channels" value="paid"><span class="dot"></span>פרסום ממומן</label>
+          <label class="opt checkbox"><input type="checkbox" name="channels" value="seo"><span class="dot"></span>SEO / קידום אורגני</label>
+          <label class="opt checkbox"><input type="checkbox" name="channels" value="agency"><span class="dot"></span>סוכנות / פרילנסר</label>
+          <label class="opt checkbox"><input type="checkbox" name="channels" value="email"><span class="dot"></span>ניוזלטר / אימייל</label>
+          <label class="opt checkbox"><input type="checkbox" name="channels" value="other_ch"><span class="dot"></span>אחר</label>
+        </div>
+      </div>
+
+      <div id="agencyBlock" style="display:none">
+        <div class="q-card">
+          <label class="q-label">מה כלל השירות שקיבלת מהסוכנות / פרילנסר?</label>
+          <textarea class="q-textarea" id="agencyDesc" placeholder="תאר בקצרה מה הם עשו עבורך"></textarea>
+        </div>
+        <div class="q-card">
+          <label class="q-label">האם הרגשת שהשיווק שלהם משקף נכון את העסק שלך?</label>
+          <div class="options">
+            <label class="opt"><input type="radio" name="agencyFit" value="yes"><span class="dot"></span>כן, ממש הרגשתי שהם מבינים אותי</label>
+            <label class="opt"><input type="radio" name="agencyFit" value="partial"><span class="dot"></span>חלקית</label>
+            <label class="opt"><input type="radio" name="agencyFit" value="no"><span class="dot"></span>לא, הרגשתי שהם לא ממש הבינו</label>
+          </div>
+        </div>
+        <div class="q-card">
+          <label class="q-label">עד כמה הרגשת בשליטה על מה שיוצא החוצה?</label>
+          <div class="scale-wrap" id="controlScale">
+            <button class="scale-btn" onclick="setScale('control',1,this)">1</button>
+            <button class="scale-btn" onclick="setScale('control',2,this)">2</button>
+            <button class="scale-btn" onclick="setScale('control',3,this)">3</button>
+            <button class="scale-btn" onclick="setScale('control',4,this)">4</button>
+            <button class="scale-btn" onclick="setScale('control',5,this)">5</button>
+          </div>
+          <div class="scale-labels"><span>בכלל לא</span><span>שליטה מלאה</span></div>
+        </div>
+      </div>
+
+      <div id="selfBlock" style="display:none">
+        <div class="q-card">
+          <label class="q-label">כמה שעות בשבוע אתה מקדיש לשיווק?</label>
+          <div class="options grid-2">
+            <label class="opt"><input type="radio" name="mktHours" value="0"><span class="dot"></span>כמעט אפס</label>
+            <label class="opt"><input type="radio" name="mktHours" value="1-2"><span class="dot"></span>1–2 שעות</label>
+            <label class="opt"><input type="radio" name="mktHours" value="3-5"><span class="dot"></span>3–5 שעות</label>
+            <label class="opt"><input type="radio" name="mktHours" value="5+"><span class="dot"></span>יותר מ-5</label>
+          </div>
+        </div>
+        <div class="q-card">
+          <label class="q-label">האם התוכן שאתה מפרסם משקף נכון את העסק שלך?</label>
+          <div class="options">
+            <label class="opt"><input type="radio" name="selfFit" value="yes"><span class="dot"></span>כן, אני מרוצה</label>
+            <label class="opt"><input type="radio" name="selfFit" value="partial"><span class="dot"></span>חלקית</label>
+            <label class="opt"><input type="radio" name="selfFit" value="no"><span class="dot"></span>לא ממש</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label class="q-label">כמה שילמת על פרסום ממומן (מטא, גוגל וכו') בחודש?</label>
+        <div class="options grid-2">
+          <label class="opt"><input type="radio" name="costPaid" value="0"><span class="dot"></span>לא שילמתי</label>
+          <label class="opt"><input type="radio" name="costPaid" value="500"><span class="dot"></span>עד 500₪</label>
+          <label class="opt"><input type="radio" name="costPaid" value="500-1500"><span class="dot"></span>500–1,500₪</label>
+          <label class="opt"><input type="radio" name="costPaid" value="1500-3000"><span class="dot"></span>1,500–3,000₪</label>
+          <label class="opt"><input type="radio" name="costPaid" value="3000-5000"><span class="dot"></span>3,000–5,000₪</label>
+          <label class="opt"><input type="radio" name="costPaid" value="5000+"><span class="dot"></span>מעל 5,000₪</label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label class="q-label">כמה שילמת על יצירת תוכן / ניהול סושיאל / סוכנות בחודש?</label>
+        <div class="options grid-2">
+          <label class="opt"><input type="radio" name="costContent" value="0"><span class="dot"></span>לא שילמתי</label>
+          <label class="opt"><input type="radio" name="costContent" value="500"><span class="dot"></span>עד 500₪</label>
+          <label class="opt"><input type="radio" name="costContent" value="500-1500"><span class="dot"></span>500–1,500₪</label>
+          <label class="opt"><input type="radio" name="costContent" value="1500-3000"><span class="dot"></span>1,500–3,000₪</label>
+          <label class="opt"><input type="radio" name="costContent" value="3000-5000"><span class="dot"></span>3,000–5,000₪</label>
+          <label class="opt"><input type="radio" name="costContent" value="5000+"><span class="dot"></span>מעל 5,000₪</label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label class="q-label">האם הרגשת שהשיווק הביא תוצאות מדידות לעסק?</label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="results" value="yes"><span class="dot"></span>כן, ראיתי תוצאות ברורות</label>
+          <label class="opt"><input type="radio" name="results" value="partial"><span class="dot"></span>חלקית, קשה לדעת בוודאות</label>
+          <label class="opt"><input type="radio" name="results" value="no"><span class="dot"></span>לא ממש</label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label class="q-label">מה הכי אהבת בשיווק שעשית?</label>
+        <textarea class="q-textarea" id="mktLiked" placeholder="מה עבד טוב?"></textarea>
+      </div>
+
+      <div class="q-card">
+        <label class="q-label">מה הכי הפריע לך?</label>
+        <textarea class="q-textarea" id="mktDisliked" placeholder="מה היה מתסכל, קשה, או לא שווה את הזמן?"></textarea>
+      </div>
+    </div>
+
+    <div id="mktNoBlock" style="display:none">
+      <div class="q-card">
+        <label class="q-label">מה עצר אותך מלשווק את העסק?</label>
+        <p class="q-hint">ניתן לבחור יותר מאחד</p>
+        <div class="options">
+          <label class="opt checkbox"><input type="checkbox" name="noReason" value="time"><span class="dot"></span>אין לי זמן</label>
+          <label class="opt checkbox"><input type="checkbox" name="noReason" value="expensive"><span class="dot"></span>יקר מדי</label>
+          <label class="opt checkbox"><input type="checkbox" name="noReason" value="howto"><span class="dot"></span>לא יודע/ת איך</label>
+          <label class="opt checkbox"><input type="checkbox" name="noReason" value="trust"><span class="dot"></span>לא מאמין/ה שזה עובד</label>
+          <label class="opt checkbox"><input type="checkbox" name="noReason" value="other_no"><span class="dot"></span>אחר</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goTo(0)">→ חזור</button>
+      <button class="btn btn-primary" onclick="goTo(2)">הבא ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Dream Service -->
+  <div class="section" id="sec2">
+    <div class="section-label">שירות החלומות</div>
+    <div class="section-title">בואו נדבר על מה שהיית באמת רוצה</div>
+
+    <div class="q-card">
+      <label class="q-label">מה הדבר הכי גדול שמונע מהעסק שלך לצמוח?</label>
+      <textarea class="q-textarea" id="growthBlock" placeholder="שיווק, זמן, כסף, אנשים — מה תחושתך?"></textarea>
+    </div>
+
+    <!-- NEW QUESTION 2: Content type preference -->
+    <div class="q-card">
+      <label class="q-label">איזה סוג תוכן הכי מייצג את העסק שלך?</label>
+      <p class="q-hint">ניתן לבחור יותר מאחד</p>
+      <div class="options">
+        <label class="opt checkbox"><input type="checkbox" name="contentType" value="photos"><span class="dot"></span>תמונות מקצועיות</label>
+        <label class="opt checkbox"><input type="checkbox" name="contentType" value="reels"><span class="dot"></span>סרטונים קצרים (ריילז, טיקטוק)</label>
+        <label class="opt checkbox"><input type="checkbox" name="contentType" value="text"><span class="dot"></span>פוסטים עם טקסט</label>
+        <label class="opt checkbox"><input type="checkbox" name="contentType" value="testimonials"><span class="dot"></span>סיפורי לקוחות / ביקורות</label>
+        <label class="opt checkbox"><input type="checkbox" name="contentType" value="unsure"><span class="dot"></span>לא יודע/ת — תמליץ לי</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">אם הייתה מערכת שמטפלת בכל השיווק שלך — מה היית צריך לראות / לאשר כדי לסמוך עליה?</label>
+      <textarea class="q-textarea" id="trustNeeds" placeholder="לדוגמה: לראות את התוכן לפני פרסום, לקבל דוח שבועי..."></textarea>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">איך היית מעדיף לאשר תוכן לפני פרסום?</label>
+      <div class="options">
+        <label class="opt"><input type="radio" name="approvalMethod" value="whatsapp"><span class="dot"></span>הודעת וואטסאפ</label>
+        <label class="opt"><input type="radio" name="approvalMethod" value="email"><span class="dot"></span>אימייל</label>
+        <label class="opt"><input type="radio" name="approvalMethod" value="app"><span class="dot"></span>אפליקציה / דשבורד</label>
+        <label class="opt"><input type="radio" name="approvalMethod" value="none"><span class="dot"></span>לא צריך לאשר — שיפורסם אוטומטית</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">מה היה גורם לך לבטל שירות כזה?</label>
+      <textarea class="q-textarea" id="cancelReason" placeholder="מה היה הקו האדום שלך?"></textarea>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goTo(1)">→ חזור</button>
+      <button class="btn btn-primary" onclick="goTo(3)">הבא ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Pricing -->
+  <div class="section" id="sec3">
+    <div class="section-label">תמחור</div>
+    <div class="section-title">בואו נדבר על כסף</div>
+
+    <div class="q-card">
+      <label class="q-label">כמה היית משלם בחודש עבור שירות שמטפל בכל השיווק שלך?</label>
+      <div class="options">
+        <label class="opt"><input type="radio" name="willPay" value="300"><span class="dot"></span>עד 300₪</label>
+        <label class="opt"><input type="radio" name="willPay" value="300-1000"><span class="dot"></span>300–1,000₪</label>
+        <label class="opt"><input type="radio" name="willPay" value="1000-2000"><span class="dot"></span>1,000–2,000₪</label>
+        <label class="opt"><input type="radio" name="willPay" value="2000-4000"><span class="dot"></span>2,000–4,000₪</label>
+        <label class="opt"><input type="radio" name="willPay" value="4000+"><span class="dot"></span>מעל 4,000₪ — אם זה מביא תוצאות</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">מה חייב להיות כלול במחיר הזה?</label>
+      <p class="q-hint">ניתן לבחור יותר מאחד</p>
+      <div class="options">
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="content_new"><span class="dot"></span>יצירת תוכן מאפס (פוסטים, סטוריז, סרטונים / ריילז)</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="content_upgrade"><span class="dot"></span>שדרוג תוכן קיים — יש לי חומר, רוצה שייראה מקצועי</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="posting"><span class="dot"></span>פרסום אוטומטי</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="paid_mgmt"><span class="dot"></span>ניהול פרסום ממומן</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="seo"><span class="dot"></span>SEO / קידום בגוגל</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="reports"><span class="dot"></span>ניטור יעילות — דוחות ותוצאות מדידות</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="aeo"><span class="dot"></span>AEO — אופטימיזציה למנועי AI (ChatGPT, גוגל AI וכו')</label>
+        <label class="opt checkbox"><input type="checkbox" name="mustInclude" value="strategy"><span class="dot"></span>אסטרטגיה וייעוץ</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">עד כמה אתה בנוח עם שימוש באפליקציות לניהול עסק?</label>
+      <div class="scale-wrap" id="techScale">
+        <button class="scale-btn" onclick="setScale('tech',1,this)">1</button>
+        <button class="scale-btn" onclick="setScale('tech',2,this)">2</button>
+        <button class="scale-btn" onclick="setScale('tech',3,this)">3</button>
+        <button class="scale-btn" onclick="setScale('tech',4,this)">4</button>
+        <button class="scale-btn" onclick="setScale('tech',5,this)">5</button>
+      </div>
+      <div class="scale-labels"><span>לא בנוח בכלל</span><span>מאוד בנוח</span></div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goTo(2)">→ חזור</button>
+      <button class="btn btn-primary" onclick="goTo(4)">הבא ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Final -->
+  <div class="section" id="sec4">
+    <div class="section-label">סיום</div>
+    <div class="section-title">כמעט סיימנו 🙌</div>
+
+    <div class="q-card">
+      <label class="q-label">יש לך עוד משהו לשתף? מחשבה, בקשה, חלום?</label>
+      <textarea class="q-textarea" id="freeText" placeholder="כל מה שרצית לומר ולא שאלנו..."></textarea>
+    </div>
+
+    <div class="q-card">
+      <label class="q-label">אימייל ליצירת קשר (אופציונלי)</label>
+      <p class="q-hint">רק אם תרצה שנחזור אליך</p>
+      <input type="email" class="q-input" id="email" placeholder="your@email.com" dir="ltr">
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goTo(3)">→ חזור</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" style="max-width:100%;flex:1">שלח את התשובות שלי ✓</button>
+    </div>
+    <div class="submit-error" id="submitError">משהו השתבש. אנא נסה שוב או שלח לנו אימייל ישירות.</div>
+  </div>
+
+  <!-- Thank you -->
+  <div class="thankyou" id="thankyou">
+    <div class="icon">✓</div>
+    <h2>תודה רבה! 🙏</h2>
+    <p>התשובות שלך יעזרו לנו לבנות משהו שבאמת יעבוד עבורך.<br>אם השארת אימייל — נחזור אליך בקרוב.</p>
+  </div>
+
+</div>
+
+<script>
+  let currentSection = 0;
+  const totalSections = 5;
+  const scaleValues = {};
+
+  function updateProgress() {
+    const pct = (currentSection / totalSections) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `שלב ${currentSection + 1} מתוך ${totalSections}`;
+  }
+
+  function goTo(n) {
+    document.getElementById('sec' + currentSection).classList.remove('active');
+    currentSection = n;
+    document.getElementById('sec' + n).classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleMktStatus() {
+    const val = document.querySelector('input[name="mktStatus"]:checked')?.value;
+    document.getElementById('mktYesBlock').style.display = (val === 'active' || val === 'past') ? 'block' : 'none';
+    document.getElementById('mktNoBlock').style.display = val === 'no' ? 'block' : 'none';
+  }
+
+  document.addEventListener('change', function(e) {
+    if (e.target.name === 'channels') {
+      const checked = [...document.querySelectorAll('input[name="channels"]:checked')].map(x => x.value);
+      document.getElementById('agencyBlock').style.display = checked.includes('agency') ? 'block' : 'none';
+      const selfChannels = ['organic', 'paid', 'seo', 'email'];
+      const hasSelf = checked.some(v => selfChannels.includes(v));
+      document.getElementById('selfBlock').style.display = hasSelf ? 'block' : 'none';
+    }
+    if (e.target.type === 'radio') {
+      const group = e.target.name;
+      document.querySelectorAll(`input[name="${group}"]`).forEach(inp => {
+        inp.closest('.opt').classList.toggle('selected', inp.checked);
+      });
+    }
+    if (e.target.type === 'checkbox') {
+      e.target.closest('.opt').classList.toggle('selected', e.target.checked);
+    }
+  });
+
+  function setScale(key, val, btn) {
+    scaleValues[key] = val;
+    const container = btn.parentElement;
+    container.querySelectorAll('.scale-btn').forEach((b, i) => {
+      b.classList.toggle('active', i < val);
+    });
+  }
+
+  function collectData() {
+    const get = id => document.getElementById(id)?.value || '';
+    const radio = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+    const checkboxes = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x => x.value);
+
+    return {
+      name: get('name'),
+      bizDesc: get('bizDesc'),
+      decider: radio('decider'),
+      existingAssets: radio('existingAssets'),
+      platforms: checkboxes('platforms').join(', '),
+      mktStatus: radio('mktStatus'),
+      channels: checkboxes('channels').join(', '),
+      agencyDesc: get('agencyDesc'),
+      agencyFit: radio('agencyFit'),
+      controlScale: scaleValues['control'] || '',
+      mktHours: radio('mktHours'),
+      selfFit: radio('selfFit'),
+      costPaid: radio('costPaid'),
+      costContent: radio('costContent'),
+      results: radio('results'),
+      mktLiked: get('mktLiked'),
+      mktDisliked: get('mktDisliked'),
+      noReason: checkboxes('noReason').join(', '),
+      growthBlock: get('growthBlock'),
+      contentType: checkboxes('contentType').join(', '),
+      trustNeeds: get('trustNeeds'),
+      approvalMethod: radio('approvalMethod'),
+      cancelReason: get('cancelReason'),
+      willPay: radio('willPay'),
+      mustInclude: checkboxes('mustInclude').join(', '),
+      techScale: scaleValues['tech'] || '',
+      freeText: get('freeText'),
+      email: get('email'),
+      _subject: 'סקר שיווק — תשובה חדשה',
+      submittedAt: new Date().toISOString()
+    };
+  }
+
+  async function submitForm() {
+    const btn = document.getElementById('submitBtn');
+    const errorEl = document.getElementById('submitError');
+    
+    btn.disabled = true;
+    btn.textContent = 'שולח...';
+    errorEl.style.display = 'none';
+
+    const data = collectData();
+
+    try {
+      const response = await fetch('https://formspree.io/f/xwvwarrn', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('thankyou').classList.add('active');
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressText').textContent = 'הושלם!';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'שלח את התשובות שלי ✓';
+    }
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
